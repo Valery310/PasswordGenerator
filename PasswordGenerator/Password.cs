@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace PasswordGenerator
 {
-    class Password
+    public class Password
     {
         private static ThreadLocal<Random> random;
         string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
@@ -26,8 +26,11 @@ namespace PasswordGenerator
 
             foreach (UserPrincipal user in principals)
             {
-                SecureString Temp = this.GeneratePassword(lengthPasswotd);
-                users.Add(new Users(user.Name, Temp));              
+                //SecureString Temp = this.GeneratePassword(lengthPasswotd);
+                string temp = Password.GetStringPassword(this.GeneratePassword(lengthPasswotd));
+                string _name = user.UserPrincipalName;
+                string name = user.DisplayName;
+                users.Add(new Users(user.Name, temp));              
             }           
             return users;
         }

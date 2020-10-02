@@ -18,7 +18,8 @@ namespace PasswordGenerator
 
             foreach (var user in Users)
             {
-                csv.AppendLine($"{DateTime.Now},{user.FIO},{Password.GetStringPassword(user.password)}");
+                // csv.AppendLine($"{DateTime.Now},{user.FIO},{Password.GetStringPassword(user.password)}");
+                csv.AppendLine($"{DateTime.Now},{user.FIO},{user.password}");
             }
 
             File.WriteAllText(path + "Password " + DateTime.Now + ".csv", csv.ToString());

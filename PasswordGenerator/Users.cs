@@ -8,10 +8,11 @@ namespace PasswordGenerator
 {
     public class Users
     {
-        public string FIO { get; private set; }
-        public SecureString password { get; private set; }
+        public string FIO { get; set; }
+        //public SecureString password { get; private set; }
+        public String password { get; set; }
         public static List<UserPrincipal> users { get; set; }
-        public Users(string fio, SecureString _password) { FIO = fio; password = _password; }
+        public Users(string fio, String _password) { FIO = fio; password = _password; }
     }
 
     public class DomainUsers 
@@ -25,7 +26,7 @@ namespace PasswordGenerator
             foreach (var item in users)
             {
                 var user = Users.users.Find(x=>x.Name == item.FIO);
-                user.SetPassword(Password.GetStringPassword(item.password));
+                //user.SetPassword(Password.GetStringPassword(item.password));
             }
         }
 
