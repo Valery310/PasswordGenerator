@@ -8,11 +8,11 @@ namespace PasswordGenerator
 {
     public class Users
     {
-        public string FIO { get; set; }
-        //public SecureString password { get; private set; }
-        public String password { get; set; }
-        public static List<UserPrincipal> users { get; set; }
-        public Users(string fio, String _password) { FIO = fio; password = _password; }
+        public string UserPrincipalName { get; private set; }
+        public string DisplayName { get; private set; }
+        public SecureString Password { get; private set; }
+        public static List<UserPrincipal> UsersPrincip { get; set; }
+        public Users(string _DisplayName, string _UserPrincipalName, SecureString _Password) { DisplayName = _DisplayName; UserPrincipalName = _UserPrincipalName; Password = _Password; }
     }
 
     public class DomainUsers 
@@ -25,14 +25,14 @@ namespace PasswordGenerator
         {
             foreach (var item in users)
             {
-                var user = Users.users.Find(x=>x.Name == item.FIO);
+                var user = Users.UsersPrincip.Find(x=>x.UserPrincipalName == item.UserPrincipalName);
                 //user.SetPassword(Password.GetStringPassword(item.password));
             }
         }
 
-        public List<UserPrincipal> GetUsers(List<string> groupeName) 
-        {
-            using (PrincipalContext principalContext = new PrincipalContext(ContextType.Domain, Path))// Path = "ssn.agrom.local"
+        public List<UserPrincipal> GetUsers(List<string> groupeName)
+        { //ContextType contextType, string name, string userName, string password)
+            using (PrincipalContext principalContext = new PrincipalContext(ContextType.Domain, Path, "kryukov.vn", "Cisco28!!"))// Path = "ssn.agrom.local"
             {
                 List<UserPrincipal> users = new List<UserPrincipal>();
                 using (PrincipalSearcher searcher = new PrincipalSearcher())

@@ -22,15 +22,12 @@ namespace PasswordGenerator
         public List<Users> CreateNewPasswordUsers(List<UserPrincipal> principals, int lengthPasswotd = 8)
         {
             List<Users> users = new List<Users>();
-            Users.users = principals;
+            Users.UsersPrincip = principals;
 
             foreach (UserPrincipal user in principals)
             {
                 //SecureString Temp = this.GeneratePassword(lengthPasswotd);
-                string temp = Password.GetStringPassword(this.GeneratePassword(lengthPasswotd));
-                string _name = user.UserPrincipalName;
-                string name = user.DisplayName;
-                users.Add(new Users(user.Name, temp));              
+                users.Add(new Users(user.DisplayName, user.UserPrincipalName, this.GeneratePassword(lengthPasswotd)));              
             }           
             return users;
         }
@@ -59,7 +56,7 @@ namespace PasswordGenerator
             {
                 result.AppendChar(item);
             }
-           // result.MakeReadOnly();
+            result.MakeReadOnly();
             return result;     
         }
 

@@ -19,6 +19,7 @@ using System.Security;
 using System.Security.Principal;
 using System.Threading;
 using System.Security.Permissions;
+using System.Windows.Threading;
 
 namespace PasswordGenerator
 {
@@ -31,19 +32,31 @@ namespace PasswordGenerator
         {
             InitializeComponent();
 
-            Console.WriteLine("Hello World!");
-            Password password = new Password(Environment.TickCount);
-            for (int i = 0; i < 20; i++)
-            {
-                Console.WriteLine(Password.GetStringPassword(password.GeneratePassword()));
-            }
-            DomainUsers domainUsers = new DomainUsers("ssn.agrom.local");
-            var users = password.CreateNewPasswordUsers(domainUsers.GetUsers(new List<string>() { "ИТ" }));
-            Table table = new Table(users);
-            table.Write(System.AppDomain.CurrentDomain.BaseDirectory);
-            //  domainUsers.ChangePasswordUsers(users);
+            Start();
         }
 
+        public async void Start() 
+        {
+            await Task.Run(() =>
+            {
+                Console.WriteLine("Hello World!");
+                Password password = new Password(Environment.TickCount);
+                for (int i = 0; i < 20; i++)
+                {
+                    Console.WriteLine(Password.GetStringPassword(password.GeneratePassword()));
+                }
+                DomainUsers domainUsers = new DomainUsers("ssn.agrom.local");
+                var users = password.CreateNewPasswordUsers(domainUsers.GetUsers(new List<string>() { "ИТ" }));
+                Table table = new Table(users);
+                table.Write(System.AppDomain.CurrentDomain.BaseDirectory);
+              //  domainUsers.ChangePasswordUsers(users);
+                //Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
+                //{
+                //    lblResult.Content = "Готово";
+                //}));
+                lblResult.Dispatcher.Invoke(new Action(() => { lblResult.Content = "Готово"; })); 
+            });
+        }
 
 
 
