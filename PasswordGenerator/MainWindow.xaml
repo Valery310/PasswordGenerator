@@ -5,9 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PasswordGenerator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Генератор паролей" Height="450" Width="800" ResizeMode="NoResize">
     <Grid>
-        <Label x:Name="lblResult" Content="Результат" HorizontalAlignment="Left" Margin="48,29,0,0" VerticalAlignment="Top" Height="40" Width="97"/>
-
+        <TabControl Margin="0,0,0,50">
+            <TabItem Header="Генерация паролей">
+                <WrapPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                            <Label HorizontalAlignment="Left" Width="250" VerticalAlignment="Top">
+                                <Label.Content>
+                                    <TextBlock Height="30" TextWrapping="Wrap">Список целевых групп безопасности пользователей</TextBlock>
+                                </Label.Content>
+                            </Label>
+                            <DataGrid x:Name="dgTargetGroup" Height="150" HorizontalScrollBarVisibility="Disabled" Width="250" HorizontalAlignment="Left" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" VerticalAlignment="Top" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding GroupName, Mode=TwoWay}" Width="250" CanUserResize="False" Header="Группа"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                                <TextBox x:Name="tbxAddRowTargetGroup" Width="150" Margin="0,2,5,0"></TextBox>
+                                <Button Width="60" x:Name="btnAddRowTargetGroup" Content="Добавить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnAddRowTargetGroup_Click"></Button>
+                            </StackPanel>
+                             <Button Width="60" x:Name="btnDelRowTargetGroup" Content="Удалить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnDelRowTargetGroup_Click"></Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Margin="5,0,0,0">
+                            <Label HorizontalAlignment="Left" Width="250" VerticalAlignment="Top">
+                                <Label.Content>
+                                    <TextBlock Height="30"  TextWrapping="Wrap">Список исключаемых групп безопасности пользователей</TextBlock>
+                                </Label.Content>
+                            </Label>
+                            <DataGrid x:Name="dgExcludedtGroup" Height="150" HorizontalScrollBarVisibility="Disabled" Width="250" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"  HorizontalAlignment="Left" VerticalAlignment="Top" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding GroupName, Mode=TwoWay}" Width="250" CanUserResize="False" Header="Группа"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                                <TextBox x:Name="tbxAddRowExcludedGroup" Width="150" Margin="0,2,5,0"></TextBox>
+                                <Button Width="60" x:Name="btnAddRowExcludedGroup" Content="Добавить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnAddRowExcludedGroup_Click"></Button>
+                            </StackPanel>
+                             <Button Width="60" x:Name="btnDelRowExcludedGroup" Content="Удалить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnDelRowExcludedGroup_Click"></Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Сгенерировать пароли" Margin="10,10,0,0"></Button>
+                        <Button Content="Изменить пароли пользователей" Margin="10,10,0,0"></Button>
+                    </StackPanel>
+                </WrapPanel>
+            </TabItem>
+            <TabItem Header="Настройка">
+                <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="160"  VerticalAlignment="Top" Width="492">
+                <WrapPanel Orientation="Vertical">
+                    <ComboBox HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="230">
+                        <TextBlock>Использовать текущего пользователя</TextBlock>
+                        <TextBlock>Ввести логин и пароль</TextBlock>
+                    </ComboBox>
+                    <StackPanel Orientation="Vertical" Margin="0,5,0,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                             <Label Width="90" Content="Адрес домена"></Label>
+                            <TextBox Width="150"></TextBox>
+                        </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <Label Width="90" Content="Логин"></Label>
+                            <TextBox Width="150"></TextBox>
+                         </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <Label Width="90" Content="Пароль"></Label>
+                            <PasswordBox Width="150"></PasswordBox>
+                        </StackPanel>
+                    </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <Button Height="20" Width="100" HorizontalAlignment="Left" Content="Проверить" Margin="10,0,10,0"></Button>
+                            <Button Height="20" Width="100" HorizontalAlignment="Left" Content="Сохранить"></Button>
+                        </StackPanel>
+                    </WrapPanel>
+                </Border>
+            </TabItem>
+        </TabControl>
+        <Label x:Name="lblResult" Content="Результат:" HorizontalAlignment="Left" Margin="490,384,0,0" VerticalAlignment="Top"  />
+        <Label Content="Ожидание" HorizontalAlignment="Left" Margin="560,384,0,0" VerticalAlignment="Top" Width="108"/>
+        <StatusBar Height="20" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

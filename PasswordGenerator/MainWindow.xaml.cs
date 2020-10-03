@@ -20,6 +20,7 @@ using System.Security.Principal;
 using System.Threading;
 using System.Security.Permissions;
 using System.Windows.Threading;
+using System.Collections.ObjectModel;
 
 namespace PasswordGenerator
 {
@@ -35,35 +36,92 @@ namespace PasswordGenerator
             Start();
         }
 
+        public ObservableCollection<Group> TargetGroup { get; set; }
+        public ObservableCollection<Group> ExcludedGroup { get; set; } 
+
         public async void Start() 
         {
-            await Task.Run(() =>
-            {
-                Console.WriteLine("Hello World!");
-                Password password = new Password(Environment.TickCount);
-                for (int i = 0; i < 20; i++)
-                {
-                    Console.WriteLine(Password.GetStringPassword(password.GeneratePassword()));
-                }
-                DomainUsers domainUsers = new DomainUsers("ssn.agrom.local");
-                var users = password.CreateNewPasswordUsers(domainUsers.GetUsers(new List<string>() { "ИТ" }));
-                Table table = new Table(users);
-                table.Write(System.AppDomain.CurrentDomain.BaseDirectory);
-              //  domainUsers.ChangePasswordUsers(users);
-                //Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
-                //{
-                //    lblResult.Content = "Готово";
-                //}));
-                lblResult.Dispatcher.Invoke(new Action(() => { lblResult.Content = "Готово"; })); 
-            });
+            TargetGroup = new ObservableCollection<Group>();
+            TargetGroup.Add(new Group("Группа"));
+            TargetGroup.CollectionChanged += TargetGroup_CollectionChanged;
+            ExcludedGroup = new ObservableCollection<Group>();
+            ExcludedGroup.Add(new Group("Группа"));
+            ExcludedGroup.CollectionChanged += ExcludedGroup_CollectionChanged;
+            dgTargetGroup.ItemsSource = TargetGroup;
+           // dgTargetGroup.DataContext = TargetGroup;
+            dgExcludedtGroup.ItemsSource = ExcludedGroup;
+            //dgExcludedtGroup.DataContext = ExcludedGroup;
+
+            //await Task.Run(() =>
+            //{
+            //    Console.WriteLine("Hello World!");
+            //    Password password = new Password(Environment.TickCount);
+            //    for (int i = 0; i < 20; i++)
+            //    {
+            //        Console.WriteLine(Password.GetStringPassword(password.GeneratePassword()));
+            //    }
+            //    DomainUsers domainUsers = new DomainUsers("ssn.agrom.local");
+            //    var users = password.CreateNewPasswordUsers(domainUsers.GetUsers(new List<string>() { "ИТ" }));
+            //    Table table = new Table(users);
+            //    table.Write(System.AppDomain.CurrentDomain.BaseDirectory);
+            //  //  domainUsers.ChangePasswordUsers(users);
+            //    //Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate
+            //    //{
+            //    //    lblResult.Content = "Готово";
+            //    //}));
+            //    lblResult.Dispatcher.Invoke(new Action(() => { lblResult.Content = "Готово"; })); 
+            //});
         }
 
+        private void TargetGroup_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+         //   MessageBox.Show("Группа добавлена");
+        }
 
+        private void ExcludedGroup_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+          //  MessageBox.Show("Группа исключена");
+          //  throw new NotImplementedException();
+        }
 
         [PrincipalPermission(SecurityAction.Demand, Role = "BUILTIN\\Users")]
         static void ShowMessage()
         {
             Console.WriteLine("Текущий принципиал зарегистрировался локально и является членом группы Users");
+        }
+
+        private void btnAddRowExcludedGroup_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(tbxAddRowExcludedGroup.Text))
+            {
+                ExcludedGroup.Add(new Group(tbxAddRowExcludedGroup.Text)); ;
+            }
+            else
+            {
+                MessageBox.Show("Введите имя группы!");
+            }
+        }
+
+        private void btnAddRowTargetGroup_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(tbxAddRowTargetGroup.Text))
+            {
+                TargetGroup.Add(new Group(tbxAddRowTargetGroup.Text)); ;
+            }
+            else
+            {
+                MessageBox.Show("Введите имя группы!");
+            }
+        }
+
+        private void btnDelRowTargetGroup_Click(object sender, RoutedEventArgs e)
+        {
+                TargetGroup.Remove(dgTargetGroup.SelectedItem as Group);                         
+        }
+
+        private void btnDelRowExcludedGroup_Click(object sender, RoutedEventArgs e)
+        {
+                ExcludedGroup.Remove(dgExcludedtGroup.SelectedItem as Group);
         }
     }
 }

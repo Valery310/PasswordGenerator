@@ -26,7 +26,6 @@ namespace PasswordGenerator
 
             foreach (UserPrincipal user in principals)
             {
-                //SecureString Temp = this.GeneratePassword(lengthPasswotd);
                 users.Add(new Users(user.DisplayName, user.UserPrincipalName, this.GeneratePassword(lengthPasswotd)));              
             }           
             return users;
