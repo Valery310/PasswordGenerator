@@ -136,7 +136,11 @@ namespace PasswordGenerator
 
         private void btnDelRowUsers_Click(object sender, RoutedEventArgs e)
         {
-            UsersList?.Remove(dgUsers?.SelectedItem as Users);
+            var user = dgUsers?.SelectedItem as Users;           
+            Predicate<UserPrincipal> FindUserPrincipal = delegate (UserPrincipal x) { return x.UserPrincipalName == user.UserPrincipalName; };
+            Users.UsersPrincip.Remove(Users.UsersPrincip.Find(FindUserPrincipal));
+            UsersList.Remove(user);
+            // Users.UsersPrincip.Remove(Users.UsersPrincip.Find((x) => { return x.UserPrincipalName == user.UserPrincipalName; }));
         }
 
         private void btnSaveSettings_Click(object sender, RoutedEventArgs e)
@@ -191,7 +195,7 @@ namespace PasswordGenerator
 
         private async void btnGenerationPasswordAndSaveTable_Click(object sender, RoutedEventArgs e)
         {
-            var users = Password.CreateNewPasswordUsers(await domainUsers.GetUsers(TargetGroup, ExcludedGroup));         
+            var users = Password.CreateNewPasswordUsers(Users.UsersPrincip);         
             Table.Write(Directory.GetCurrentDirectory(), await users);
         }
 

@@ -28,7 +28,7 @@ namespace PasswordGenerator
             new Random(Interlocked.Increment( ref i)));
         }
 
-        public async static Task<List<Users>> CreateNewPasswordUsers(ObservableCollection<UserPrincipal> principals, int lengthPasswotd = 8)
+        public async static Task<List<Users>> CreateNewPasswordUsers(List<UserPrincipal> principals, int lengthPasswotd = 8)
         {
             List<Users> users = new List<Users>();
             Users.UsersPrincip = principals.ToList();

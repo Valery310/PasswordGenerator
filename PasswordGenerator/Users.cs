@@ -127,6 +127,7 @@ namespace PasswordGenerator
                     }
                     ResultDomainUsers(null, new EventArgsResultDomainUsers($"Пользователи получены."));
                 });
+                Users.UsersPrincip = users.ToList();
                 return users;
             }            
         }
@@ -208,7 +209,11 @@ namespace PasswordGenerator
             }
             else if (principal is UserPrincipal)
             {
-                list.Add((UserPrincipal)principal);
+                // Users.UsersPrincip.Add((UserPrincipal)principal);
+                if (((UserPrincipal)principal).Enabled == true)
+                {
+                    list.Add((UserPrincipal)principal);
+                }
             }
         }
 
