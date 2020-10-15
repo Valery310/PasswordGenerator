@@ -1,39 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace PasswordGenerator
 {
-    public class Password
+    public static class Password
     {
+        public static event EventHandler<EventArgsResultPass> ResultPass;
+
         private static ThreadLocal<Random> random;
-        string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
-        string[] vowels = { "a", "e", "i", "o", "u", "y" };
-        Dictionary<string, string> pairs = new Dictionary<string, string>() { { "l", "!" },{ "o", "0" },{ "a", "@" },{ "s", "$" } };
+        static string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "z" };
+        static string[] vowels = { "a", "e", "i", "o", "u", "y" };
+        static Dictionary<string, string> pairs = new Dictionary<string, string>() { { "l", "!" },{ "o", "0" },{ "a", "@" },{ "s", "$" } };
 
-        public Password(int _seed) => random = new ThreadLocal<Random>(() =>
-        new Random(Interlocked.Increment(ref _seed)));
+        static Password()
+        {
+            int i = Environment.TickCount;
+            random = new ThreadLocal<Random>(() =>
+            new Random(Interlocked.Increment( ref i)));
+        }
 
-        public List<Users> CreateNewPasswordUsers(List<UserPrincipal> principals, int lengthPasswotd = 8)
+        public async static Task<List<Users>> CreateNewPasswordUsers(ObservableCollection<UserPrincipal> principals, int lengthPasswotd = 8)
         {
             List<Users> users = new List<Users>();
-            Users.UsersPrincip = principals;
+            Users.UsersPrincip = principals.ToList();
+            ResultPass(null, new EventArgsResultPass("Начинаю генерацию паролей."));
 
-            foreach (UserPrincipal user in principals)
-            {
-                users.Add(new Users(user.DisplayName, user.UserPrincipalName, this.GeneratePassword(lengthPasswotd)));              
-            }           
+            await Task.Run(()=> {
+                foreach (UserPrincipal user in principals)
+                {
+                    users.Add(new Users(user.DisplayName, user.UserPrincipalName, Encryption.Encrypt(GeneratePassword(lengthPasswotd))));
+                    ResultPass(null, new EventArgsResultPass($"Сгенерирован новый пароль для {user.DisplayName}."));
+                }
+            });
+            
+            ResultPass(null, new EventArgsResultPass("Пароли сгенерированы."));
+            users.Sort();
             return users;
         }
 
        
 
-        public SecureString GeneratePassword(int length = 8) 
+        public static string GeneratePassword(int length = 8) 
         {
             StringBuilder password = new StringBuilder();
             int number = random.Value.Next(0, 9 * Convert.ToInt32(Math.Pow(10, (length / 2)-1)));
@@ -50,16 +66,17 @@ namespace PasswordGenerator
                 password.Append(number.ToString());             
             }
 
-            SecureString result = new SecureString();
-            foreach (var item in password.ToString())
-            {
-                result.AppendChar(item);
-            }
-            result.MakeReadOnly();
-            return result;     
+            //SecureString result = new SecureString();
+            //foreach (var item in password.ToString())
+            //{
+            //    result.AppendChar(item);
+            //}
+            //result.MakeReadOnly();
+            //return result;     
+            return password.ToString();
         }
 
-        private void GenerateWord(ref StringBuilder password, int length) 
+        private static void GenerateWord(ref StringBuilder password, int length) 
         {
             TypeSymbol temp = TypeSymbol.Consonats;
             while (password.Length < length)
@@ -81,16 +98,16 @@ namespace PasswordGenerator
             }
         }
 
-        private void GetSymbol(ref string ch) 
+        private static void GetSymbol(ref string ch) 
         {
             LetterCase letterCase = NextGenericEnum<LetterCase>();
             switch (letterCase)
             {
                 case LetterCase.Lower:
-                    ch.ToLower();
+                    ch = ch.ToLower();
                     break;
                 case LetterCase.Top:
-                    ch.ToUpper();
+                    ch = ch.ToUpper();
                     break;
                 case LetterCase.Alternative:
                     ch = GetAlternativeSymbol(ch);
@@ -98,7 +115,7 @@ namespace PasswordGenerator
             }
         } 
 
-        private string GetAlternativeSymbol(string ch) 
+        private static string GetAlternativeSymbol(string ch) 
         {
             string result;
             if (pairs.TryGetValue(ch, out result))
@@ -130,7 +147,7 @@ namespace PasswordGenerator
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        private T NextGenericEnum<T>()
+        private static T NextGenericEnum<T>()
             where T : struct, IConvertible
         {
             if (!typeof(T).IsEnum)
@@ -143,6 +160,14 @@ namespace PasswordGenerator
         }
     }
 
+    public class EventArgsResultPass
+    {
+        public string Message { get; set; }
+        public EventArgsResultPass(string message)
+        {
+            Message = message;
+        }
+    }
 
     enum PlaceNumber { Begin, End }
     enum LetterCase { Top, Lower, Alternative } 

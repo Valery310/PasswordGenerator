@@ -5,70 +5,81 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using Newtonsoft.Json;
 
 namespace PasswordGenerator
 {
-    public class Table
+    public static class Table
     { 
-        DateTime now { get; set; }
-        List<Users> Users { get; set; }
+        static DateTime now { get; set; }
+        //static List<Users> Users { get; set; }
 
-        public Table(List<Users> users) => Users = users;
+        // public static void SetUsers(List<Users> users) => Users = users;
 
-        public async void Write(string path) 
+        public static event EventHandler<EventArgsResultTable> ResultTable;
+
+        public static async void Write(string path, List<Users> Users) 
         {
             StringBuilder csv = new StringBuilder();
 
             foreach (var user in Users)
             {
-                csv.AppendLine($"{DateTime.Now},{user.DisplayName},{user.UserPrincipalName},{Password.GetStringPassword(user.Password)}");
-            }
-
+                csv.AppendLine($"{DateTime.Now},{user.DisplayName},{user.UserPrincipalName},{Encryption.Decrypt(user.Password)}");//{Password.GetStringPassword(user.Password)}");
+            }           
             try
             {
-                File.WriteAllText(path + "Password " + DateTime.Now.ToString("dd-MM-yyyy-HH-mm") + ".csv", csv.ToString(), Encoding.Unicode);
+               File.WriteAllText(path + "\\Password " + DateTime.Now.ToString("dd-MM-yyyy-HH-mm") + ".csv", csv.ToString(), Encoding.Unicode);                
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Не удалось сохранить таблицу с паролями. Попробуйте еще раз или смените директорию сохранения.");
+                ResultTable(null, new EventArgsResultTable("Не удалось сохранить таблицу с паролями. Попробуйте еще раз или смените директорию сохранения."));
             }
             
             try
             {
-                using (FileStream fs = File.Create(Application.ResourceAssembly.Location + "ListUser.jsn"))
-                {
-                    await JsonSerializer.SerializeAsync<List<Users>>(fs, Users);
-                }
+                string ser = JsonConvert.SerializeObject(Users);
+                File.WriteAllText(Directory.GetCurrentDirectory() + "\\ListUser.json", ser, Encoding.Unicode);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Не удалось успешно сохранить файл с настройками пользователей. Попробуйте еще раз.");
+                ResultTable(null, new EventArgsResultTable("Не удалось сохранить файл с настройками пользователей. Попробуйте еще раз."));
             }
-           
+            ResultTable(null, new EventArgsResultTable("Сохранение выполнено."));
         }
 
-        public async Task<List<Users>> ReadAsync() 
+        public static async Task<List<Users>> ReadAsync() 
         {
-            try
+            ResultTable(null, new EventArgsResultTable("Чтение настроек."));
+            List<Users> users = null; 
+            if (File.Exists(Directory.GetCurrentDirectory() + "\\ListUser.json"))
             {
-                using (FileStream fs = File.OpenRead(Application.ResourceAssembly.Location + "ListUser.jsn"))
+                try
                 {
-                    return await JsonSerializer.DeserializeAsync<List<Users>>(fs);
+                  //  string des1 = File.ReadAllText(Directory.GetCurrentDirectory() + "\\ListUser.json", Encoding.Unicode);
+                    string des = await File.ReadAllTextAsync(Directory.GetCurrentDirectory() + "\\ListUser.json", Encoding.Unicode);
+                    users = JsonConvert.DeserializeObject<List<Users>>(des);
+                    ResultTable(null, new EventArgsResultTable("Данные считаны."));
+                }
+                catch (Exception ex)
+                {
+                    ResultTable(null, new EventArgsResultTable(ex.Message));
                 }
             }
-            catch (FileNotFoundException ex)
+            else
             {
-                MessageBox.Show("Не найден файл настроек пользователей! Сгенерируйте новый.");
+                ResultTable(null, new EventArgsResultTable("Не найден файл настроек пользователей! Сгенерируйте новый."));
             }
-            catch (JsonException ex)
-            {
-                MessageBox.Show("Поврежден файл настроек пользователей! Сгенерируйте новый.");
-            }
-            catch (Exception ex) 
-            {
-                MessageBox.Show(ex.Message);
-            }
-            throw new Exception("Не удалось загрузить настройки.");
+                     
+            return users;
+        }
+    }
+
+    public class EventArgsResultTable
+    {
+        public string Message { get; set; }
+        public EventArgsResultTable(string message)
+        {
+            Message = message;
         }
     }
 }

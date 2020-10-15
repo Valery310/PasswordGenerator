@@ -4,85 +4,141 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PasswordGenerator"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         mc:Ignorable="d"
-        Title="Генератор паролей" Height="450" Width="800" ResizeMode="NoResize">
+        Title="Генератор паролей" Height="500" Name="Main" Width="850" MinHeight="500" MinWidth="850" ResizeMode="NoResize">
+    <Window.Resources>
+        <CollectionViewSource IsLiveFilteringRequested="True" x:Key="Groups" Source="{Binding ElementName=Main, Path=Groups}">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="GroupName" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+    </Window.Resources>
     <Grid>
-        <TabControl Margin="0,0,0,50">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TabControl Margin="0,0,0,0" Grid.Row="0" Grid.Column="0">
             <TabItem Header="Генерация паролей">
-                <WrapPanel Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                            <Label HorizontalAlignment="Left" Width="250" VerticalAlignment="Top">
-                                <Label.Content>
-                                    <TextBlock Height="30" TextWrapping="Wrap">Список целевых групп безопасности пользователей</TextBlock>
-                                </Label.Content>
-                            </Label>
-                            <DataGrid x:Name="dgTargetGroup" Height="150" HorizontalScrollBarVisibility="Disabled" Width="250" HorizontalAlignment="Left" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" VerticalAlignment="Top" SelectionMode="Single">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding GroupName, Mode=TwoWay}" Width="250" CanUserResize="False" Header="Группа"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-                                <TextBox x:Name="tbxAddRowTargetGroup" Width="150" Margin="0,2,5,0"></TextBox>
-                                <Button Width="60" x:Name="btnAddRowTargetGroup" Content="Добавить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnAddRowTargetGroup_Click"></Button>
-                            </StackPanel>
-                             <Button Width="60" x:Name="btnDelRowTargetGroup" Content="Удалить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnDelRowTargetGroup_Click"></Button>
-                        </StackPanel>
-                        <StackPanel Orientation="Vertical" Margin="5,0,0,0">
-                            <Label HorizontalAlignment="Left" Width="250" VerticalAlignment="Top">
-                                <Label.Content>
-                                    <TextBlock Height="30"  TextWrapping="Wrap">Список исключаемых групп безопасности пользователей</TextBlock>
-                                </Label.Content>
-                            </Label>
-                            <DataGrid x:Name="dgExcludedtGroup" Height="150" HorizontalScrollBarVisibility="Disabled" Width="250" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"  HorizontalAlignment="Left" VerticalAlignment="Top" SelectionMode="Single">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding GroupName, Mode=TwoWay}" Width="250" CanUserResize="False" Header="Группа"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
-                                <TextBox x:Name="tbxAddRowExcludedGroup" Width="150" Margin="0,2,5,0"></TextBox>
-                                <Button Width="60" x:Name="btnAddRowExcludedGroup" Content="Добавить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnAddRowExcludedGroup_Click"></Button>
-                            </StackPanel>
-                             <Button Width="60" x:Name="btnDelRowExcludedGroup" Content="Удалить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnDelRowExcludedGroup_Click"></Button>
-                        </StackPanel>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Content="Сгенерировать пароли" Margin="10,10,0,0"></Button>
-                        <Button Content="Изменить пароли пользователей" Margin="10,10,0,0"></Button>
-                    </StackPanel>
-                </WrapPanel>
+                <Grid >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"></RowDefinition>
+                        <RowDefinition Height="1*"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <WrapPanel  Orientation="Vertical" Margin="5,0,0,0" Grid.Row="0" Grid.Column="0" >
+                        <Label HorizontalAlignment="Left" Width="250" VerticalAlignment="Top">
+                            <Label.Content>
+                                <TextBlock Height="30" TextWrapping="Wrap">Список целевых групп безопасности пользователей</TextBlock>
+                            </Label.Content>
+                        </Label>
+                        <DataGrid x:Name="dgTargetGroup" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" MinHeight="150" HorizontalScrollBarVisibility="Disabled" MinWidth="250" HorizontalAlignment="Left" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" VerticalAlignment="Top" SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding GroupName, Mode=TwoWay}" Width="250" CanUserResize="False" Header="Группа"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                            <ComboBox x:Name="cmbAddRowTargetGroup" ItemsSource="{Binding Source={StaticResource Groups}}" Width="150" Margin="0,2,5,0" DisplayMemberPath="GroupName"
+                                SelectedValuePath="GroupName" SelectedValue="{Binding Path=Group}">
+                            </ComboBox>
+                            <Button Width="60" x:Name="btnAddRowTargetGroup" Content="Добавить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnAddRowTargetGroup_Click"></Button>
+                        </WrapPanel>
+                        <Button Width="60" x:Name="btnDelRowTargetGroup" Content="Удалить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnDelRowTargetGroup_Click"></Button>
+                    </WrapPanel>
+                    <WrapPanel Orientation="Vertical" Margin="5,0,0,0" Grid.Row="0" Grid.Column="1">
+                        <Label HorizontalAlignment="Left" Width="250" VerticalAlignment="Top">
+                            <Label.Content>
+                                <TextBlock Height="30"  TextWrapping="Wrap">Список исключаемых групп безопасности пользователей</TextBlock>
+                            </Label.Content>
+                        </Label>
+                        <DataGrid x:Name="dgExcludedtGroup" Height="150" HorizontalScrollBarVisibility="Disabled" Width="250" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True"  HorizontalAlignment="Left" VerticalAlignment="Top" SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding GroupName, Mode=TwoWay}" Width="250" CanUserResize="False" Header="Группа"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                            <ComboBox x:Name="cmbAddRowExcludedGroup" ItemsSource="{Binding Path=Groups}" Width="150" Margin="0,2,5,0" DisplayMemberPath="GroupName"
+                                SelectedValuePath="GroupName" SelectedValue="{Binding Path=Group}">
+                            </ComboBox>
+                            <Button Width="60" x:Name="btnAddRowExcludedGroup" Content="Добавить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnAddRowExcludedGroup_Click"></Button>
+                        </WrapPanel>
+                        <Button Width="60" x:Name="btnDelRowExcludedGroup" Content="Удалить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnDelRowExcludedGroup_Click"></Button>
+                    </WrapPanel>
+                    <WrapPanel Orientation="Vertical" Margin="5,0,0,0" Grid.Row="0" Grid.Column="2">
+                        <Label HorizontalAlignment="Left" Width="250" VerticalAlignment="Top">
+                            <Label.Content>
+                                <TextBlock Height="30" TextWrapping="Wrap">Пользователи</TextBlock>
+                            </Label.Content>
+                        </Label>
+                        <DataGrid x:Name="dgUsers" Height="150" HorizontalScrollBarVisibility="Disabled" Width="250" HorizontalAlignment="Left" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False" VerticalAlignment="Top" SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding DisplayName, Mode=TwoWay}" Width="250" CanUserResize="False" Header="Пользователь"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Width="60" x:Name="btnDelRowUsers" Content="Удалить" HorizontalAlignment="Right" Margin="0,5,0,0" Click="btnDelRowUsers_Click"></Button>
+                    </WrapPanel>
+
+                    <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="3">
+                        <Button x:Name="btnGetDomainGroups" Content="Получить список групп в домене" Margin="10,10,0,0" Click="btnGetDomainGroups_Click"></Button>
+                        <Button x:Name="btnGetDomainUsers" Content="Получить список пользователей" Margin="10,10,0,0" Click="btnGetDomainUsers_Click" ></Button>
+                        <Button x:Name="btnGenerationPasswordAndSaveTable" Content="Сгенерировать пароли" Margin="10,10,0,0" Click="btnGenerationPasswordAndSaveTable_Click" ></Button>
+                        <Button x:Name="btnChangePasswordUsers" Content="Изменить пароли пользователей" Margin="10,10,0,0" Click="btnChangePasswordUsers_Click"></Button>
+                    </WrapPanel>
+                </Grid>
             </TabItem>
             <TabItem Header="Настройка">
                 <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="160"  VerticalAlignment="Top" Width="492">
-                <WrapPanel Orientation="Vertical">
-                    <ComboBox HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="230">
-                        <TextBlock>Использовать текущего пользователя</TextBlock>
-                        <TextBlock>Ввести логин и пароль</TextBlock>
-                    </ComboBox>
-                    <StackPanel Orientation="Vertical" Margin="0,5,0,0">
-                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                             <Label Width="90" Content="Адрес домена"></Label>
-                            <TextBox Width="150"></TextBox>
-                        </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                            <Label Width="90" Content="Логин"></Label>
-                            <TextBox Width="150"></TextBox>
-                         </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                            <Label Width="90" Content="Пароль"></Label>
-                            <PasswordBox Width="150"></PasswordBox>
-                        </StackPanel>
-                    </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                            <Button Height="20" Width="100" HorizontalAlignment="Left" Content="Проверить" Margin="10,0,10,0"></Button>
-                            <Button Height="20" Width="100" HorizontalAlignment="Left" Content="Сохранить"></Button>
-                        </StackPanel>
+                    <WrapPanel Orientation="Vertical">
+                        <ComboBox x:Name="cmbbxTypeLogin" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="230" SelectionChanged="cmbbxTypeLogin_SelectionChanged">
+                            <ComboBoxItem Tag="0" IsSelected="True">
+                                <TextBlock>Использовать текущего пользователя</TextBlock>
+                            </ComboBoxItem>
+                            <ComboBoxItem Tag="1">
+                                <TextBlock>Ввести логин и пароль</TextBlock>
+                            </ComboBoxItem>
+                        </ComboBox>
+                        <WrapPanel Orientation="Vertical" Margin="0,5,0,0">
+                            <WrapPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                <Label Width="90" Content="Адрес домена"></Label>
+                                <TextBox x:Name="tbxServer" Width="150"></TextBox>
+                            </WrapPanel>
+                            <WrapPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                <Label Width="90" Content="Логин"></Label>
+                                <TextBox x:Name="tbxLogin" IsEnabled="False" Width="150"></TextBox>
+                            </WrapPanel>
+                            <WrapPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                <Label Width="90" Content="Пароль"></Label>
+                                <PasswordBox IsEnabled="False" x:Name="pbxPassword" Width="150"></PasswordBox>
+                            </WrapPanel>
+                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <Button x:Name="btnTestConnection" Height="20" Width="100" HorizontalAlignment="Left" Content="Проверить" Margin="10,0,10,0" Click="btnTestConnection_Click"></Button>
+                            <Button x:Name="btnSaveSettings" Height="20" Width="100" HorizontalAlignment="Left" Content="Сохранить" Click="btnSaveSettings_Click"></Button>
+                        </WrapPanel>
                     </WrapPanel>
                 </Border>
             </TabItem>
         </TabControl>
-        <Label x:Name="lblResult" Content="Результат:" HorizontalAlignment="Left" Margin="490,384,0,0" VerticalAlignment="Top"  />
-        <Label Content="Ожидание" HorizontalAlignment="Left" Margin="560,384,0,0" VerticalAlignment="Top" Width="108"/>
-        <StatusBar Height="20" VerticalAlignment="Bottom"/>
+       <!-- <StackPanel Orientation="Vertical" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left">
+            <Label x:Name="lblRes" Content="Результат:" HorizontalAlignment="Right" VerticalAlignment="Top"  Height="26" Width="65"  /></StackPanel>-->
+        <ScrollViewer x:Name="svConsole" Margin="10,0" Grid.Row="1" Grid.Column="0" >
+            <TextBlock Text="Ожидание" x:Name="lblResult" VerticalAlignment="Top" Margin="0" MinWidth="108" />
+        </ScrollViewer>
+        <StatusBar Height="20" VerticalAlignment="Top" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch">
+            <StatusBarItem HorizontalContentAlignment="Stretch">
+                <ProgressBar x:Name="ProgressBarMain" Minimum="0" Maximum="100" IsIndeterminate="False" Height="15" >
+                </ProgressBar>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>
