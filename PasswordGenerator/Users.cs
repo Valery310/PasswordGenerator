@@ -210,7 +210,7 @@ namespace PasswordGenerator
             else if (principal is UserPrincipal)
             {
                 // Users.UsersPrincip.Add((UserPrincipal)principal);
-                if (((UserPrincipal)principal).Enabled == true)
+                if (((UserPrincipal)principal).Enabled == true && !list.Contains((UserPrincipal)principal))
                 {
                     list.Add((UserPrincipal)principal);
                 }
