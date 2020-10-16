@@ -254,7 +254,7 @@ namespace PasswordGenerator
         {
             this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (ThreadStart)delegate ()
            {
-               lblResult.Text += "\n" + message;
+               lblResult.Text += "\n " + DateTime.Now.ToString("dd-MM-yyyy-HH-mm") + ": " + message;
                svConsole.ScrollToEnd();
            });
             
@@ -287,7 +287,7 @@ namespace PasswordGenerator
 
         public static void FileCreate()
         {
-            string path = Directory.GetCurrentDirectory() + "\\" + DateTime.Now.ToString("dd - MM - yyyy") + "log.txt";
+            string path = Directory.GetCurrentDirectory() + "\\" + DateTime.Now.ToString("dd-MM-yyyy") + ".log";
 
             if (!File.Exists(path))
             {
@@ -301,12 +301,12 @@ namespace PasswordGenerator
         {
             FileCreate();
             await Task.Run(() => {
-                fs = new FileStream(Directory.GetCurrentDirectory() + "\\" + DateTime.Now.ToString("dd - MM - yyyy") + "log.txt",
+                fs = new FileStream(Directory.GetCurrentDirectory() + "\\" + DateTime.Now.ToString("dd-MM-yyyy") + ".log",
                 FileMode.Append, FileAccess.Write, FileShare.Write,
                 bufferSize: 4096, useAsync: true);
                 using (StreamWriter sw = new StreamWriter(fs, Encoding.UTF8))
                 {
-                    sw.WriteLineAsync(eventMessage);
+                    sw.WriteLineAsync($"{ DateTime.Now.ToString("dd-MM-yyyy-HH-mm")}: {eventMessage}");
                     sw.Close();
                 }
             });
