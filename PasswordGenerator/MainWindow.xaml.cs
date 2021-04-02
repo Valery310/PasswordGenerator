@@ -201,7 +201,7 @@ namespace PasswordGenerator
 
         private async void btnChangePasswordUsers_Click(object sender, RoutedEventArgs e)
         {
-            List<Users> users = await Table.ReadAsync();
+            List<Users> users = await Table.ReadAsyncCSV(); //await Table.ReadAsync();
             DomainUsers.ChangePasswordUsers(users);
         }
 
