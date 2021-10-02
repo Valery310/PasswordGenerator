@@ -148,7 +148,9 @@ namespace PasswordGenerator
             Settings.Default.Domain = tbxServer.Text;
             Settings.Default.Login = tbxLogin.Text;
             Settings.Default.Password = Encryption.Encrypt(pbxPassword.Password);
+            Settings.Default.TypeLogin = cmbbxTypeLogin.SelectedIndex;
             Settings.Default.Save();
+           // MessageBox.Show($"Сохраненный логин: {Settings.Default.Login}, сохраненный пароль: {Encryption.Decrypt(Settings.Default.Password)}");
         }
 
         private void btnTestConnection_Click(object sender, RoutedEventArgs e)
@@ -156,10 +158,6 @@ namespace PasswordGenerator
             LogoPas login = new LogoPas() { Login = tbxLogin.Text, Password = pbxPassword.Password };
             Connect.TestConnection(tbxServer.Text, (TypeLogin)int.Parse((string)((ComboBoxItem)((ComboBox)cmbbxTypeLogin).SelectedItem).Tag), login);
         }
-
-
-
-      
 
         public static bool ConnectionDomain(string server)
         {

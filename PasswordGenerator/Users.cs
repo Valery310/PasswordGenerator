@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using static PasswordGenerator.MainWindow;
 
 namespace PasswordGenerator
@@ -77,7 +78,7 @@ namespace PasswordGenerator
         {
 
             ResultDomainUsers(null, new EventArgsResultDomainUsers($"Запрос пользователя из домена..."));
-            using (PrincipalContext principalContext = GetPrincipalContext(Path))
+            using (PrincipalContext principalContext = GetPrincipalContext(Path).Result)
             {
                 ResultDomainUsers(null, new EventArgsResultDomainUsers($"Соединение с доменом установлено."));
                 UserPrincipal userPrincipal = null;
@@ -107,7 +108,7 @@ namespace PasswordGenerator
         public async Task<ObservableCollection<UserPrincipal>> GetUsers(ObservableCollection<Group> TargetGroup, ObservableCollection<Group> ExcludedGroup)
         {            
             ResultDomainUsers(null, new EventArgsResultDomainUsers($"Запрос пользователей из домена..."));
-            using (PrincipalContext principalContext = GetPrincipalContext(Path))
+            using (PrincipalContext principalContext = GetPrincipalContext(Path).Result)
             {             
                     ResultDomainUsers(null, new EventArgsResultDomainUsers($"Соединение с доменом установлено."));
                     ObservableCollection<UserPrincipal> users = new ObservableCollection<UserPrincipal>();
@@ -135,7 +136,7 @@ namespace PasswordGenerator
         public async Task<ObservableCollection<Group>> GetGroup()
         { 
             ResultDomainUsers(null, new EventArgsResultDomainUsers($"Запрос групп из домена..."));
-            using (PrincipalContext principalContext = GetPrincipalContext(Path))
+            using (PrincipalContext principalContext = GetPrincipalContext(Path).Result)
             {
                 ResultDomainUsers(null, new EventArgsResultDomainUsers($"Соединение с доменом установлено."));
                 ObservableCollection<Group> groups = new ObservableCollection<Group>();
@@ -157,45 +158,57 @@ namespace PasswordGenerator
             }
         }
 
-        public static PrincipalContext GetPrincipalContext(string Path, LogoPas logoPas = null) 
+        public static async Task<PrincipalContext> GetPrincipalContext(string Path, LogoPas logoPas = null) 
         {
-            PrincipalContext temp = null;
-            switch (Settings.Default.TypeLogin)
+            return await Task<PrincipalContext>.Run(() =>
             {
-                case (int)TypeLogin.CurrentUser:
-                    if (!String.IsNullOrWhiteSpace(Path))
+
+                PrincipalContext temp = null;
+                try
+                {
+                    switch (Settings.Default.TypeLogin)
                     {
-                        temp = new PrincipalContext(ContextType.Domain, Path);
+                        case (int)TypeLogin.CurrentUser:
+                            if (!String.IsNullOrWhiteSpace(Path))
+                            {
+                                temp = new PrincipalContext(ContextType.Domain, Path);
+                            }
+                            else
+                            {
+                                ResultDomainUsers(null, new EventArgsResultDomainUsers("Проверьте имя домена!"));
+                            }
+                            break;
+                        case (int)TypeLogin.LoginPass:
+                            if (string.IsNullOrWhiteSpace(Path))
+                            {
+                                ResultDomainUsers(null, new EventArgsResultDomainUsers("Проверьте имя домена!"));
+                            }
+                            if (logoPas != null && !string.IsNullOrWhiteSpace(logoPas.Login) && !string.IsNullOrWhiteSpace(logoPas.Password))
+                            {
+                                temp = new PrincipalContext(ContextType.Domain, Path, logoPas.Login, logoPas.Password);
+                            }
+                            else if (!string.IsNullOrWhiteSpace(Settings.Default.Login) && !string.IsNullOrWhiteSpace(Encryption.Decrypt(Settings.Default.Password)))
+                            {
+                                temp = new PrincipalContext(ContextType.Domain, Path, Settings.Default.Login, Encryption.Decrypt(Settings.Default.Password));
+                            }
+                            else
+                            {
+                                ResultDomainUsers(null, new EventArgsResultDomainUsers("Проверьте логин и пароль!"));
+                            }
+                            break;
+                        default:
+                            temp = new PrincipalContext(ContextType.Domain, Path);
+                            break;
                     }
-                    else
-                    {
-                        ResultDomainUsers(null, new EventArgsResultDomainUsers("Проверьте имя домена!"));
-                    }
-                    
-                    break;
-                case (int)TypeLogin.LoginPass:
-                    if (string.IsNullOrWhiteSpace(Path))
-                    {                
-                        ResultDomainUsers(null, new EventArgsResultDomainUsers("Проверьте имя домена!"));
-                    }
-                    if (logoPas!=null && !string.IsNullOrWhiteSpace(logoPas.Login) && !string.IsNullOrWhiteSpace(logoPas.Password))
-                    {
-                        temp = new PrincipalContext(ContextType.Domain, Path, logoPas.Login, logoPas.Password);
-                    }
-                    else if(!string.IsNullOrWhiteSpace(Settings.Default.Login) && !string.IsNullOrWhiteSpace(Encryption.Decrypt(Settings.Default.Password)))
-                    {
-                        temp = new PrincipalContext(ContextType.Domain, Path, Settings.Default.Login, Encryption.Decrypt(Settings.Default.Password));
-                    }
-                    else
-                    {
-                        ResultDomainUsers(null, new EventArgsResultDomainUsers("Проверьте логин и пароль!"));
-                    }
-                    break;
-                default:
-                    temp = new PrincipalContext(ContextType.Domain, Path);
-                    break;
-            }
-            return temp;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                    return null;
+                }
+                return temp;
+            });
+           
         }
 
         private void RecursiveGetUser(Principal principal, ObservableCollection<UserPrincipal> list, ObservableCollection<Group> ExcludedGroup)

@@ -32,7 +32,7 @@ namespace PasswordGenerator
             {
                File.WriteAllText(path + "\\Password " + DateTime.Now.ToString("dd-MM-yyyy-HH-mm") + ".csv", csv.ToString(), Encoding.Unicode);                
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ResultTable(null, new EventArgsResultTable("Не удалось сохранить таблицу с паролями. Попробуйте еще раз или смените директорию сохранения."));
             }

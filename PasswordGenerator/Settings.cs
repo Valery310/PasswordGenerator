@@ -24,6 +24,8 @@ namespace PasswordGenerator
             mainWindow.tbxServer.Text = PasswordGenerator.Properties.Settings.Default.Domain;
             mainWindow.tbxLogin.Text = Settings.Default.Login;
             mainWindow.pbxPassword.Password = Encryption.Decrypt(Settings.Default.Password);
+            mainWindow.cmbbxTypeLogin.SelectedIndex = Settings.Default.TypeLogin;
+
             switch (Settings.Default.TypeLogin)
             {
                 case (int)TypeLogin.LoginPass:
